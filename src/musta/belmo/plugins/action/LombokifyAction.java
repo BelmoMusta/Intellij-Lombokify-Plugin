@@ -1,15 +1,26 @@
 package musta.belmo.plugins.action;
 
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.search.GlobalSearchScope;
 import musta.belmo.plugins.ast.PsiLombokTransformer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class LombokifyAction extends AbstractAction {
     @Override
     protected PsiLombokTransformer getTransformer() {
+
+        Optional<PsiClass> lombokGetter = Optional.ofNullable(JavaPsiFacade.getInstance(project)
+                .findClass("lombok.Getter", GlobalSearchScope.everythingScope(project)));
+        if (lombokGetter.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "lombok dependency is not found in this project");
+            return null;
+        }
         JPanel al = new JPanel();
         List<JCheckBox> checkBoxes = getCheckBoxes();
         for (JCheckBox checkBox : checkBoxes) {

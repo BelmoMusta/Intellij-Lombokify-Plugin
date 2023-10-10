@@ -15,6 +15,7 @@ import com.intellij.psi.impl.file.PsiJavaDirectoryImpl;
 import musta.belmo.plugins.ast.PsiUtils;
 import musta.belmo.plugins.ast.Transformer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,11 @@ import java.util.List;
 public abstract class AbstractAction extends AnAction {
 
     private Transformer transformer;
+    protected Project project;
 
     @Override
     public void update(AnActionEvent e) {
-        Project project = e.getProject();
+        project = e.getProject();
         e.getPresentation().setEnabledAndVisible(project != null);
     }
 
@@ -47,7 +49,7 @@ public abstract class AbstractAction extends AnAction {
     }
     private void applyAction(@NotNull AnActionEvent event, List<PsiElement> psiJavaFiles) {
         transformer = getTransformer();
-        if(transformer.isApplied()) {
+        if(transformer != null && transformer.isApplied()) {
             try {
                 CommandProcessor.getInstance().executeCommand(getEventProject(event),
                         () -> ApplicationManager.getApplication().runWriteAction(() -> {
@@ -60,5 +62,6 @@ public abstract class AbstractAction extends AnAction {
             }
         }
     }
-    protected abstract Transformer getTransformer();
+   @Nullable
+   protected abstract Transformer getTransformer();
 }
